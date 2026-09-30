@@ -1,0 +1,225 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Attendance History</title>
+
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        background: #f4f6f9;
+        padding: 30px;
+      }
+
+      h1 {
+        margin-bottom: 10px;
+      }
+
+      .controls {
+        background: white;
+        padding: 20px;
+        margin-top: 25px;
+        border-radius: 10px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+      }
+
+      .controls label {
+        font-weight: bold;
+        margin-right: 10px;
+      }
+
+      .controls input {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 6px;
+      }
+
+      .controls button {
+        padding: 10px 18px;
+        margin-left: 8px;
+        border: none;
+        border-radius: 6px;
+        background: #0d6efd;
+        color: white;
+        cursor: pointer;
+      }
+
+      .controls button:hover {
+        background: #0b5ed7;
+      }
+
+      #message {
+        margin-top: 20px;
+        font-weight: bold;
+      }
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        margin-top: 25px;
+      }
+
+      th,
+      td {
+        padding: 12px;
+        border: 1px solid #ddd;
+        text-align: left;
+      }
+
+      th {
+        background: #222;
+        color: white;
+      }
+
+      .present {
+        color: green;
+        font-weight: bold;
+      }
+
+      .absent {
+        color: red;
+        font-weight: bold;
+      }
+
+      .back {
+        display: inline-block;
+        margin-top: 25px;
+        text-decoration: none;
+        color: #0d6efd;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h1>Attendance History</h1>
+
+    <p>View attendance records for any day.</p>
+
+    <div class="controls">
+      <label for="attendanceDate">Select Date:</label>
+
+      <input type="date" id="attendanceDate" />
+
+      <button onclick="loadHistory()">View Attendance</button>
+    </div>
+
+    <p id="message"></p>
+
+    <div id="historyContainer"></div>
+
+    <a href="/admin.html" class="back">← Back to Dashboard</a>
+
+    <script>
+      async function loadHistory() {
+        const date = document.getElementById("attendanceDate").value;
+
+        const container = document.getElementById("historyContainer");
+
+        const message = document.getElementById("message");
+
+        if (!date) {
+          message.textContent = "Please select a date.";
+          return;
+        }
+
+        message.textContent = "Loading attendance...";
+        container.innerHTML = "";
+
+        try {
+          const response = await fetch(
+            `/admin/attendance/history?date=${date}`,
+          );
+
+          const data = await response.json();
+
+          if (!data.success) {
+            message.textContent = data.message;
+            return;
+          }
+
+          message.textContent = `Attendance for ${formatDate(data.date)}`;
+
+          let html = `
+            <table>
+              <thead>
+                <tr>
+                  <th>ID</th>
+                  <th>Teacher</th>
+                  <th>Email</th>
+                  <th>Sign In</th>
+                  <th>Sign Out</th>
+                  <th>Status</th>
+                </tr>
+              </thead>
+
+              <tbody>
+          `;
+
+          data.attendance.forEach((teacher) => {
+            const statusClass =
+              teacher.status === "Present" ? "present" : "absent";
+
+            html += `
+              <tr>
+                <td>${teacher.id}</td>
+                <td>${teacher.name}</td>
+                <td>${teacher.email}</td>
+                <td>${teacher.sign_in || "-"}</td>
+                <td>${teacher.sign_out || "-"}</td>
+                <td class="${statusClass}">
+                  ${teacher.status}
+                </td>
+              </tr>
+            `;
+          });
+
+          html += `
+              </tbody>
+            </table>
+          `;
+
+          container.innerHTML = html;
+        } catch (error) {
+          console.log("History error:", error);
+
+          message.textContent = "Unable to connect to the server.";
+        }
+      }
+
+      function formatDate(dateString) {
+        const date = new Date(dateString + "T00:00:00");
+
+        return date.toLocaleDateString("en-US", {
+          weekday: "long",
+          month: "long",
+          day: "numeric",
+          year: "numeric",
+        });
+      }
+
+      // Automatically select today's date
+      const today = new Date();
+
+      const year = today.getFullYear();
+
+      const month = String(today.getMonth() + 1).padStart(2, "0");
+
+      const day = String(today.getDate()).padStart(2, "0");
+
+      document.getElementById("attendanceDate").value =
+        `${year}-${month}-${day}`;
+
+      // Load today's attendance automatically
+      loadHistory();
+    </script>
+  </body>
+</html>

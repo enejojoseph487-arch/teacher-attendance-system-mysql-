@@ -1,0 +1,890 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+
+    <title>Admin Dashboard</title>
+
+    <style>
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        font-family: Arial, sans-serif;
+        background: #f4f6f9;
+        color: #222;
+      }
+
+      /* =========================
+         HEADER
+      ========================= */
+
+      header {
+        height: 65px;
+        background: #0d6efd;
+        color: white;
+        display: flex;
+        align-items: center;
+        padding: 0 20px;
+        gap: 20px;
+      }
+
+      .menu-btn {
+        font-size: 28px;
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+      }
+
+      header h1 {
+        font-size: 22px;
+      }
+
+      /* =========================
+         SIDEBAR
+      ========================= */
+
+      .sidebar {
+        position: fixed;
+        top: 0;
+        left: -260px;
+        width: 260px;
+        height: 100%;
+        background: #222;
+        color: white;
+        padding-top: 70px;
+        transition: 0.3s;
+        z-index: 1000;
+      }
+
+      .sidebar.active {
+        left: 0;
+      }
+
+      .sidebar button {
+        display: block;
+        width: 100%;
+        padding: 16px 20px;
+        border: none;
+        background: none;
+        color: white;
+        text-align: left;
+        font-size: 16px;
+        cursor: pointer;
+      }
+
+      .sidebar button:hover {
+        background: #333;
+      }
+
+      .close-btn {
+        position: absolute;
+        top: 15px;
+        right: 15px;
+        font-size: 25px;
+        background: none;
+        border: none;
+        color: white;
+        cursor: pointer;
+      }
+
+      /* =========================
+         MAIN CONTENT
+      ========================= */
+
+      .container {
+        max-width: 1100px;
+        margin: 30px auto;
+        padding: 20px;
+      }
+
+      .welcome {
+        margin-bottom: 25px;
+      }
+
+      .welcome h2 {
+        margin-bottom: 8px;
+      }
+
+      /* =========================
+         SUMMARY CARDS
+      ========================= */
+
+      .cards {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        gap: 20px;
+        margin-bottom: 30px;
+      }
+
+      .card {
+        background: white;
+        padding: 25px;
+        border-radius: 10px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+      }
+
+      .card h3 {
+        margin-bottom: 10px;
+      }
+
+      .number {
+        font-size: 30px;
+        font-weight: bold;
+      }
+
+      /* =========================
+         SECTIONS
+      ========================= */
+
+      .section {
+        display: none;
+      }
+
+      .section.active {
+        display: block;
+      }
+
+      /* =========================
+         TABLE
+      ========================= */
+
+      table {
+        width: 100%;
+        border-collapse: collapse;
+        background: white;
+        margin-top: 20px;
+      }
+
+      th,
+      td {
+        padding: 12px;
+        border: 1px solid #ddd;
+        text-align: left;
+      }
+
+      th {
+        background: #222;
+        color: white;
+      }
+
+      .present {
+        color: green;
+        font-weight: bold;
+      }
+
+      .absent {
+        color: red;
+        font-weight: bold;
+      }
+
+      /* =========================
+         FORMS
+      ========================= */
+
+      form {
+        background: white;
+        padding: 25px;
+        border-radius: 10px;
+        max-width: 600px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.08);
+      }
+
+      input {
+        width: 100%;
+        padding: 12px;
+        margin-bottom: 15px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+
+      .btn {
+        padding: 10px 18px;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        background: #0d6efd;
+        color: white;
+      }
+
+      .edit-btn {
+        background: #ffc107;
+        color: black;
+      }
+
+      .delete-btn {
+        background: #dc3545;
+        color: white;
+      }
+
+      /* =========================
+         MOBILE
+      ========================= */
+
+      @media (max-width: 600px) {
+        .container {
+          padding: 15px;
+        }
+
+        table {
+          font-size: 14px;
+        }
+
+        th,
+        td {
+          padding: 8px;
+        }
+      }
+    </style>
+  </head>
+
+  <body>
+    <!-- =========================
+         HEADER
+    ========================= -->
+
+    <header>
+      <button class="menu-btn" onclick="openMenu()">☰</button>
+
+      <h1>Admin Dashboard</h1>
+    </header>
+
+    <!-- =========================
+         SIDEBAR
+    ========================= -->
+
+    <div id="sidebar" class="sidebar">
+      <button class="close-btn" onclick="closeMenu()">×</button>
+
+      <button onclick="showSection('dashboard')">🏠 Dashboard</button>
+
+      <button onclick="showSection('teachers')">👨‍🏫 Registered Teachers</button>
+
+      <button onclick="showSection('addTeacher')">➕ Add Teacher</button>
+
+      <button onclick="openAttendanceHistory()">📅 Attendance History</button>
+
+      <button onclick="logout()">🚪 Logout</button>
+    </div>
+
+    <!-- =========================
+         MAIN CONTAINER
+    ========================= -->
+
+    <div class="container">
+      <!-- =========================
+           DASHBOARD
+      ========================= -->
+
+      <section id="dashboard" class="section active">
+        <div class="welcome">
+          <h2>Welcome, Admin! 👋</h2>
+          <p>Here is today's attendance.</p>
+        </div>
+
+        <!-- SUMMARY -->
+
+        <div class="cards">
+          <div class="card">
+            <h3>Total Teachers</h3>
+            <div class="number" id="totalTeachers">0</div>
+          </div>
+
+          <div class="card">
+            <h3>Present</h3>
+            <div class="number" id="presentCount">0</div>
+          </div>
+
+          <div class="card">
+            <h3>Absent</h3>
+            <div class="number" id="absentCount">0</div>
+          </div>
+        </div>
+
+        <!-- TODAY'S ATTENDANCE -->
+
+        <h2>Today's Attendance</h2>
+
+        <div id="todayAttendanceContainer">Loading today's attendance...</div>
+      </section>
+
+      <!-- =========================
+           REGISTERED TEACHERS
+      ========================= -->
+
+      <section id="teachers" class="section">
+        <h2>Registered Teachers</h2>
+
+        <div id="teachersContainer">Loading teachers...</div>
+      </section>
+
+      <!-- =========================
+           ADD TEACHER
+      ========================= -->
+
+      <section id="addTeacher" class="section">
+        <h2>Add New Teacher</h2>
+
+        <br />
+
+        <form id="addTeacherForm">
+          <input
+            type="text"
+            id="teacherName"
+            placeholder="Teacher Name"
+            required
+          />
+
+          <input
+            type="email"
+            id="teacherEmail"
+            placeholder="Teacher Email"
+            required
+          />
+
+          <input
+            type="password"
+            id="teacherPassword"
+            placeholder="Teacher Password"
+            required
+          />
+
+          <button class="btn" type="submit">Add Teacher</button>
+        </form>
+
+        <p id="teacherMessage"></p>
+      </section>
+
+      <!-- =========================
+           ATTENDANCE HISTORY
+      ========================= -->
+
+      <section id="history" class="section">
+        <h2>Attendance History</h2>
+
+        <div id="attendanceContainer">Loading attendance history...</div>
+      </section>
+    </div>
+
+    <!-- =========================
+         JAVASCRIPT
+    ========================= -->
+
+    <script>
+      /* =========================
+         MENU
+      ========================= */
+
+      function openMenu() {
+        document.getElementById("sidebar").classList.add("active");
+      }
+
+      function closeMenu() {
+        document.getElementById("sidebar").classList.remove("active");
+      }
+
+      /* =========================
+         CHANGE SECTIONS
+      ========================= */
+
+      function showSection(sectionId) {
+        const sections = document.querySelectorAll(".section");
+
+        sections.forEach((section) => {
+          section.classList.remove("active");
+        });
+
+        document.getElementById(sectionId).classList.add("active");
+
+        closeMenu();
+      }
+
+      /* =========================
+         TODAY'S ATTENDANCE
+      ========================= */
+
+      async function loadTodayAttendance() {
+        try {
+          const response = await fetch("/admin/attendance/today");
+
+          const data = await response.json();
+
+          const container = document.getElementById("todayAttendanceContainer");
+
+          if (!data.success) {
+            container.innerHTML = `<p>${data.message}</p>`;
+
+            return;
+          }
+
+          let present = 0;
+          let absent = 0;
+
+          data.attendance.forEach((teacher) => {
+            if (teacher.status === "Present") {
+              present++;
+            } else {
+              absent++;
+            }
+          });
+
+          document.getElementById("totalTeachers").textContent =
+            data.attendance.length;
+
+          document.getElementById("presentCount").textContent = present;
+
+          document.getElementById("absentCount").textContent = absent;
+
+          if (data.attendance.length === 0) {
+            container.innerHTML = "<p>No teachers registered.</p>";
+
+            return;
+          }
+
+          let html = `
+
+            <table>
+
+              <thead>
+
+                <tr>
+                  <th>Teacher</th>
+                  <th>Email</th>
+                  <th>Status</th>
+                  <th>Sign In</th>
+                  <th>Sign Out</th>
+                </tr>
+
+              </thead>
+
+              <tbody>
+
+          `;
+
+          data.attendance.forEach((teacher) => {
+            const statusClass =
+              teacher.status === "Present" ? "present" : "absent";
+
+            html += `
+
+              <tr>
+
+                <td>${teacher.name}</td>
+
+                <td>${teacher.email}</td>
+
+                <td class="${statusClass}">
+                  ${teacher.status}
+                </td>
+
+                <td>
+                  ${teacher.sign_in || "-"}
+                </td>
+
+                <td>
+                  ${teacher.sign_out || "-"}
+                </td>
+
+              </tr>
+
+            `;
+          });
+
+          html += `
+
+              </tbody>
+
+            </table>
+
+          `;
+
+          container.innerHTML = html;
+        } catch (error) {
+          console.log("Today's attendance error:", error);
+
+          document.getElementById("todayAttendanceContainer").innerHTML =
+            "<p>Unable to connect to server.</p>";
+        }
+      }
+
+      /* =========================
+         LOAD TEACHERS
+      ========================= */
+
+      async function loadTeachers() {
+        try {
+          const response = await fetch("/admin/teachers");
+
+          const data = await response.json();
+
+          const container = document.getElementById("teachersContainer");
+
+          if (!data.success) {
+            container.innerHTML = `<p>${data.message}</p>`;
+
+            return;
+          }
+
+          let html = `
+
+            <table>
+
+              <thead>
+
+                <tr>
+                  <th>ID</th>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Actions</th>
+                </tr>
+
+              </thead>
+
+              <tbody>
+
+          `;
+
+          data.teachers.forEach((teacher) => {
+            html += `
+
+              <tr>
+
+                <td>${teacher.id}</td>
+
+                <td>${teacher.name}</td>
+
+                <td>${teacher.email}</td>
+
+                <td>
+
+                  <button
+                    class="btn edit-btn"
+                    onclick="editTeacher(
+                      ${teacher.id},
+                      '${teacher.name}',
+                      '${teacher.email}'
+                    )"
+                  >
+                    Edit
+                  </button>
+
+                  <button
+                    class="btn delete-btn"
+                    onclick="deleteTeacher(${teacher.id})"
+                  >
+                    Delete
+                  </button>
+
+                </td>
+
+              </tr>
+
+            `;
+          });
+
+          html += `
+
+              </tbody>
+
+            </table>
+
+          `;
+
+          container.innerHTML = html;
+        } catch (error) {
+          console.log("Teachers error:", error);
+
+          document.getElementById("teachersContainer").innerHTML =
+            "<p>Unable to load teachers.</p>";
+        }
+      }
+
+      /* =========================
+         ADD TEACHER
+      ========================= */
+
+      document
+        .getElementById("addTeacherForm")
+        .addEventListener("submit", async function (event) {
+          event.preventDefault();
+
+          const name = document.getElementById("teacherName").value;
+
+          const email = document.getElementById("teacherEmail").value;
+
+          const password = document.getElementById("teacherPassword").value;
+
+          const message = document.getElementById("teacherMessage");
+
+          try {
+            const response = await fetch("/admin/add-teacher", {
+              method: "POST",
+
+              headers: {
+                "Content-Type": "application/json",
+              },
+
+              body: JSON.stringify({
+                name,
+                email,
+                password,
+              }),
+            });
+
+            const data = await response.json();
+
+            message.textContent = data.message;
+
+            if (data.success) {
+              document.getElementById("addTeacherForm").reset();
+
+              loadTeachers();
+            }
+          } catch (error) {
+            console.log("Add teacher error:", error);
+
+            message.textContent = "Unable to connect to server.";
+          }
+        });
+
+      /* =========================
+         EDIT TEACHER
+      ========================= */
+
+      async function editTeacher(id, oldName, oldEmail) {
+        const newName = prompt("Enter new teacher name:", oldName);
+
+        if (newName === null) {
+
+          return;
+        }
+
+        const newEmail = prompt("Enter new teacher email:", oldEmail);
+
+        if (newEmail === null) {
+          return;
+        }
+
+        if (!newName || !newEmail) {
+          alert("Name and email cannot be empty.");
+
+          return;
+        }
+
+        try {
+          const response = await fetch(`/admin/edit-teacher/${id}`, {
+            method: "PUT",
+
+            headers: {
+              "Content-Type": "application/json",
+            },
+
+            body: JSON.stringify({
+              name: newName,
+              email: newEmail,
+            }),
+          });
+
+          const data = await response.json();
+
+          alert(data.message);
+
+          if (data.success) {
+            loadTeachers();
+          }
+        } catch (error) {
+          console.log("Edit teacher error:", error);
+
+          alert("Unable to connect to server.");
+        }
+      }
+
+      /* =========================
+         DELETE TEACHER
+      ========================= */
+
+      async function deleteTeacher(id) {
+        const confirmDelete = confirm(
+          "Are you sure you want to delete this teacher?",
+        );
+
+        if (!confirmDelete) {
+          return;
+        }
+
+        try {
+          const response = await fetch(`/admin/delete-teacher/${id}`, {
+            method: "DELETE",
+          });
+
+          const data = await response.json();
+
+          alert(data.message);
+
+          if (data.success) {
+            loadTeachers();
+
+            loadTodayAttendance();
+          }
+        } catch (error) {
+          console.log("Delete teacher error:", error);
+
+          alert("Unable to connect to server.");
+        }
+      }
+
+      /* =========================
+         ATTENDANCE HISTORY
+      ========================= */
+
+      async function loadAttendance() {
+        try {
+          const response = await fetch("/admin/attendance");
+
+          const data = await response.json();
+
+          const container = document.getElementById("attendanceContainer");
+
+          if (!data.success) {
+            container.innerHTML = "<p>Unable to load attendance.</p>";
+
+            return;
+          }
+
+          if (data.attendance.length === 0) {
+            container.innerHTML = "<p>No attendance records found.</p>";
+
+            return;
+          }
+
+          const grouped = {};
+
+          data.attendance.forEach((record) => {
+            if (!grouped[record.date]) {
+              grouped[record.date] = [];
+            }
+
+            grouped[record.date].push(record);
+          });
+
+          container.innerHTML = "";
+
+          Object.keys(grouped).forEach((date) => {
+            const records = grouped[date];
+
+            const cleanDate = String(date).split("T")[0];
+
+            const [year, month, day] = cleanDate.split("-");
+
+            const dayDate = new Date(
+              Number(year),
+              Number(month) - 1,
+              Number(day),
+            );
+
+            const dayName = dayDate.toLocaleDateString("en-US", {
+              weekday: "long",
+            });
+
+            const formattedDate = dayDate.toLocaleDateString("en-US", {
+              month: "long",
+              day: "numeric",
+              year: "numeric",
+            });
+
+            const heading = document.createElement("h2");
+
+            heading.textContent = `${dayName}, ${formattedDate}`;
+
+            const table = document.createElement("table");
+
+            table.innerHTML = `
+
+                <thead>
+
+                  <tr>
+                    <th>Teacher</th>
+                    <th>Sign In</th>
+                    <th>Sign Out</th>
+                    <th>Status</th>
+                  </tr>
+
+                </thead>
+
+                <tbody></tbody>
+
+              `;
+
+            const tbody = table.querySelector("tbody");
+
+            records.forEach((record) => {
+              const row = document.createElement("tr");
+
+              row.innerHTML = `
+
+                    <td>${record.name}</td>
+
+                    <td>
+                      ${record.sign_in || "-"}
+                    </td>
+
+                    <td>
+                      ${record.sign_out || "-"}
+                    </td>
+
+                    <td>
+                      ${record.status}
+                    </td>
+
+                  `;
+
+              tbody.appendChild(row);
+            });
+
+            container.appendChild(heading);
+
+            container.appendChild(table);
+          });
+        } catch (error) {
+          console.log("Attendance history error:", error);
+
+          document.getElementById("attendanceContainer").innerHTML =
+            "<p>Unable to connect to server.</p>";
+        }
+      }
+
+      /* =========================
+         LOGOUT
+      ========================= */
+
+      function logout() {
+        localStorage.removeItem("user");
+
+        window.location.href = "/index.html";
+      }
+
+      /* =========================
+         START
+      ========================= */
+
+      loadTodayAttendance();
+
+      loadTeachers();
+
+      loadAttendance();
+
+      // Refresh today's attendance
+      // every 5 seconds
+
+      setInterval(loadTodayAttendance, 5000);
+      function openAttendanceHistory() {
+        window.location.href = "/attendance-history.html";
+      }
+    </script>
+  </body>
+</html>
