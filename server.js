@@ -567,8 +567,12 @@ app.get("/admin/attendance/history", (req, res) => {
 // START SERVER
 // ===============================
 app.get("/health", (req, res) => {
-  db.query("SELECT COUNT(*) AS n FROM users", (err, rows) => {
-    res.json({ error: err ? err.message : null, rows });
+  db.getConnection((err, conn) => {
+    if (err) return res.json({ step: "connect", code: err.code, error: err.message });
+    conn.query("SELECT COUNT(*) AS n FROM users", (qErr, rows) => {
+      conn.release();
+      res.json({ step: "query", error: qErr ? qErr.message : null, rows });
+    });
   });
 });
 
