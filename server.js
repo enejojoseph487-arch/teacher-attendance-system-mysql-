@@ -566,6 +566,11 @@ app.get("/admin/attendance/history", (req, res) => {
 // ===============================
 // START SERVER
 // ===============================
+app.get("/health", (req, res) => {
+  db.query("SELECT COUNT(*) AS n FROM users", (err, rows) => {
+    res.json({ error: err ? err.message : null, rows });
+  });
+});
 
 const PORT = process.env.PORT || 3000;
 
