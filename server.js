@@ -568,11 +568,18 @@ app.get("/admin/attendance/history", (req, res) => {
 // ===============================
 app.get("/health", (req, res) => {
   db.getConnection((err, conn) => {
-    if (err) return res.json({ step: "connect", code: err.code, error: err.message });
+    if (err)
+      return res.json({ step: "connect", code: err.code, error: err.message });
     conn.query("SELECT COUNT(*) AS n FROM users", (qErr, rows) => {
       conn.release();
       res.json({ step: "query", error: qErr ? qErr.message : null, rows });
     });
+  });
+});
+app.get("/ping", (req, res) => {
+  db.query("SELECT 1", (err) => {
+    if (err) return res.status(500).send("db error");
+    res.send("ok");
   });
 });
 
